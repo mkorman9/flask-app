@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:15
+    ports:
+      - 127.0.0.1:5432:5432
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ${PWD}/migrations/:/docker-entrypoint-initdb.d/:ro

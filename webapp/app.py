@@ -1,29 +1,26 @@
 from flask import request
 from pydantic import BaseModel, constr
-from uuid_extensions import uuid7str
 
-from webapp.base import app
+from webapp.base import create_base_app
+from webapp.todo_items import find_todo_items, add_todo_item
+
+app = create_base_app()
 
 
 class TodoItemModel(BaseModel):
     content: constr(min_length=1)
 
 
-items = [{'id': '0657a144-93c6-77b2-8000-c7926fdd3686', 'content': 'Test Item'}] if app.config['TEST_DATA'] else []
-
-
 @app.get('/api/items')
 def get_todo_items():
-    return items
+    return list(find_todo_items())
 
 
 @app.post('/api/items')
 def create_todo_item():
     payload = TodoItemModel(**request.get_json())
 
-    item_id = uuid7str()
-    items.append({'id': item_id, 'content': payload.content})
-
+    item_id = add_todo_item(payload.content)
     return {'id': item_id}
 
 
