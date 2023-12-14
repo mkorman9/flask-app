@@ -3,6 +3,14 @@ import json
 import pytest
 
 from tests.fixtures import flask_app, client
+from webapp.todo_items import delete_all_todo_items
+
+
+@pytest.fixture(autouse=True)
+def clear_database():
+    yield
+
+    delete_all_todo_items()
 
 
 @pytest.mark.usefixtures('flask_app', 'client')
