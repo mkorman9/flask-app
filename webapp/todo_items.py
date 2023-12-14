@@ -13,17 +13,17 @@ class TodoItem:
 
 def find_todo_items() -> Generator[TodoItem, None, None]:
     with pool.connection() as conn:
-        with conn.execute('SELECT id, content from todo_items') as result:
+        with conn.execute('select id, content from todo_items') as result:
             return (TodoItem(item_id=record[0], content=record[1]) for record in result.fetchall())
 
 
 def add_todo_item(content: str) -> str:
     item_id = uuid7str()
     with pool.connection() as conn:
-        conn.execute('INSERT INTO todo_items (id, content) VALUES (%s, %s)', (item_id, content))
+        conn.execute('insert into todo_items (id, content) values (%s, %s)', (item_id, content))
         return item_id
 
 
 def delete_all_todo_items():
     with pool.connection() as conn:
-        conn.execute('DELETE FROM todo_items')
+        conn.execute('delete from todo_items')
