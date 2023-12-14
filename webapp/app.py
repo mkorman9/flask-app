@@ -13,7 +13,7 @@ class TodoItemModel(BaseModel):
 
 @app.get('/api/items')
 def get_todo_items():
-    return list(find_todo_items())
+    return [item.__dict__ for item in find_todo_items()]
 
 
 @app.post('/api/items')

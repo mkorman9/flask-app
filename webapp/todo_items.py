@@ -1,17 +1,22 @@
+from typing import Generator
+
 from uuid_extensions import uuid7str
 
 from webapp.db import pool
 
 
-def find_todo_items():
+class TodoItem:
+    def __init__(self, item_id, content):
+        self.id = item_id
+        self.content = content
+
+
+def find_todo_items() -> Generator[TodoItem, None, None]:
     with pool.connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute('SELECT id, content from todo_items')
             for record in cursor.fetchall():
-                yield {
-                    'id': record[0],
-                    'content': record[1]
-                }
+                yield TodoItem(item_id=record[0], content=record[1])
 
 
 def add_todo_item(content: str) -> str:
