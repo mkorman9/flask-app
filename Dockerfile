@@ -12,7 +12,9 @@ EXPOSE 8080
 
 COPY --chown=www-data:www-data webapp /runtime/webapp/
 COPY --chown=www-data:www-data requirements.txt /runtime/requirements.txt
+
 COPY --chmod=544 .docker/entrypoint.sh /runtime/entrypoint.sh
+COPY .docker/uwsgi.ini /runtime/uwsgi.ini
 COPY .docker/nginx.conf /etc/nginx/nginx.conf
 
 RUN pip install -r requirements.txt
