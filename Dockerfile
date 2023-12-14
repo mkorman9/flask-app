@@ -1,22 +1,17 @@
 FROM python:3.12-slim-bookworm
 
-RUN apt -y update && \
-	apt -y install build-essential nginx && \
-	pip install uWSGI==2.0.23 && \
-	apt -y remove build-essential gcc make g++ libc6-dev dpkg-dev subversion mercurial && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN adduser --disabled-login --no-create-home --shell /bin/false --gecos "" runner
 
 WORKDIR /runtime
 EXPOSE 8080
 
-COPY --chown=www-data:www-data webapp /runtime/webapp/
-COPY --chown=www-data:www-data requirements.txt /runtime/requirements.txt
-
-COPY --chmod=544 .docker/entrypoint.sh /runtime/entrypoint.sh
-COPY .docker/uwsgi.ini /runtime/uwsgi.ini
-COPY .docker/nginx.conf /etc/nginx/nginx.conf
+COPY --chown=runner:runner webapp /runtime/webapp/
+COPY --chown=runner:runner requirements.txt /runtime/requirements.txt
 
 RUN pip install -r requirements.txt
 
-CMD ["./entrypoint.sh"]
+CMD exec python -m gunicorn \
+    --workers ${WORKERS_COUNT:-8} \
+    --bind "0.0.0.0:${HTTP_PORT:-8080}" \
+    --user runner --group runner \
+    webapp.app:app

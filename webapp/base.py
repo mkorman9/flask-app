@@ -1,3 +1,5 @@
+import atexit
+import os
 import sys
 import traceback
 
@@ -9,23 +11,26 @@ from werkzeug.exceptions import HTTPException
 from webapp.db import pool
 
 
+def __on_startup():
+    # open postgres connection pool
+    try:
+        pool.open(wait=True, timeout=10)
+    except PoolTimeout:
+        print('Failed to connect to the database: Timeout')
+        sys.exit(4)
+
+    print(f'✅ Worker #{os.getpid()} is ready')
+
+
+def __on_shutdown():
+    pool.close()
+
+
 def create_base_app() -> Flask:
     app = Flask(__name__)
 
-    def on_start():
-        try:
-            pool.open(wait=True, timeout=10)
-        except PoolTimeout:
-            print('Failed to connect to the database: Timeout')
-            __abort()
-
-        print(f'✅ Worker #{__worker_id()} is ready')
-
-    try:
-        from uwsgidecorators import postfork
-        postfork(on_start)
-    except ImportError:
-        on_start()
+    __on_startup()
+    atexit.register(__on_shutdown)
 
     @app.errorhandler(ValidationError)
     def validation_error(e: ValidationError):
@@ -65,21 +70,3 @@ def create_base_app() -> Flask:
         }, e.code
 
     return app
-
-
-def __abort():
-    try:
-        import uwsgi
-        uwsgi.stop()
-    except ImportError:
-        pass
-
-    sys.exit(1)
-
-
-def __worker_id():
-    try:
-        import uwsgi
-        return uwsgi.worker_id()
-    except ImportError:
-        return 1

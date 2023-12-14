@@ -14,4 +14,4 @@ try:
     config = ConfigModel(**os.environ)
 except ValidationError as e:
     print('Failed to load configuration:', e)
-    sys.exit(1)
+    sys.exit(4)
