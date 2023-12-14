@@ -21,12 +21,11 @@ def create_base_app() -> Flask:
 
         print(f'✅ Worker #{__worker_id()} is ready')
 
-    def on_stop():
-        pool.close()
-
-        print(f'⛔ Worker #{__worker_id()} has stopped')
-
-    __register_hooks(on_start, on_stop)
+    try:
+        from uwsgidecorators import postfork
+        postfork(on_start)
+    except ImportError:
+        on_start()
 
     @app.errorhandler(ValidationError)
     def validation_error(e: ValidationError):
@@ -66,18 +65,6 @@ def create_base_app() -> Flask:
         }, e.code
 
     return app
-
-
-def __register_hooks(on_start, on_stop):
-    try:
-        from uwsgidecorators import postfork
-        import uwsgi
-        postfork(on_start)
-        uwsgi.atexit = on_stop
-    except ImportError:
-        import atexit
-        on_start()
-        atexit.register(on_stop)
 
 
 def __abort():
