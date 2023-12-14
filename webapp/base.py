@@ -19,8 +19,12 @@ def create_base_app() -> Flask:
             print('Failed to connect to the database: Timeout')
             __abort()
 
+        print(f'✅ Worker #{__worker_id()} is ready')
+
     def on_stop():
         pool.close()
+
+        print(f'⛔ Worker #{__worker_id()} has stopped')
 
     __register_hooks(on_start, on_stop)
 
@@ -84,3 +88,11 @@ def __abort():
         pass
 
     sys.exit(1)
+
+
+def __worker_id():
+    try:
+        import uwsgi
+        return uwsgi.worker_id()
+    except ImportError:
+        return 1
