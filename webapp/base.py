@@ -21,12 +21,12 @@ def on_stop():
 try:
     from uwsgidecorators import postfork
     import uwsgi
-    postfork(lambda: on_start())
-    uwsgi.atexit = lambda: on_stop()
+    postfork(on_start)
+    uwsgi.atexit = on_stop
 except ImportError:
     import atexit
     on_start()
-    atexit.register(lambda: on_stop())
+    atexit.register(on_stop)
 
 
 @app.errorhandler(ValidationError)
