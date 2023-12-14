@@ -16,7 +16,7 @@ def create_base_app() -> Flask:
     def on_stop():
         pool.close()
 
-    register_hooks(on_start, on_stop)
+    __register_hooks(on_start, on_stop)
 
     @app.errorhandler(ValidationError)
     def validation_error(e: ValidationError):
@@ -58,7 +58,7 @@ def create_base_app() -> Flask:
     return app
 
 
-def register_hooks(on_start, on_stop):
+def __register_hooks(on_start, on_stop):
     try:
         from uwsgidecorators import postfork
         import uwsgi
