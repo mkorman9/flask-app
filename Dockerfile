@@ -1,4 +1,4 @@
-FROM python:3.12-bookworm
+FROM python:3.12-slim-bookworm
 
 RUN apt -y update && \
 	apt -y install build-essential nginx && \
