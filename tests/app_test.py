@@ -23,5 +23,4 @@ def test_save_and_get_items(client):
 
     body = json.loads(response.data)
     assert len(body) == 1
-    print(body)
     assert body[0]['content'] == content
