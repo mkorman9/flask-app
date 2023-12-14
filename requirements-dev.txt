@@ -1,2 +1,2 @@
 pytest==7.4.3
-testcontainers-core-0.0.1rc1
+testcontainers-core==0.0.1rc1
