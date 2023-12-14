@@ -11,7 +11,7 @@ COPY --chown=runner:runner requirements.txt /runtime/requirements.txt
 RUN pip install -r requirements.txt
 
 CMD exec python -m gunicorn \
-    --workers ${WORKERS_COUNT:-8} \
+    --workers ${WORKERS_COUNT:-4} \
     --bind "0.0.0.0:${HTTP_PORT:-8080}" \
     --user runner --group runner \
     webapp.app:app
