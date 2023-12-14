@@ -6,9 +6,27 @@ from werkzeug.exceptions import HTTPException
 
 from webapp import config
 
-
 app = Flask(__name__)
 app.config.update(config.values)
+
+
+def on_start():
+    pass
+
+
+def on_stop():
+    pass
+
+
+try:
+    from uwsgidecorators import postfork
+    import uwsgi
+    postfork(lambda: on_start())
+    uwsgi.atexit = lambda: on_stop()
+except ImportError:
+    import atexit
+    on_start()
+    atexit.register(lambda: on_stop())
 
 
 @app.errorhandler(ValidationError)

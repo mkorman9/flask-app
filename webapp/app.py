@@ -12,6 +12,11 @@ class TodoItemModel(BaseModel):
 items = [{'id': '0657a144-93c6-77b2-8000-c7926fdd3686', 'content': 'Test Item'}] if app.config['TEST_DATA'] else []
 
 
+@app.get('/')
+def hello_world():
+    return {'hello': 'world'}
+
+
 @app.get('/api/items')
 def get_todo_items():
     return items
