@@ -14,5 +14,6 @@ sed -i "s/%HTTP_PORT%/${HTTP_PORT:-8080}/g" /etc/nginx/nginx.conf && \
     --processes=${UWSGI_WORKERS:-8} \
     --pidfile=/var/run/uwsgi-master.pid \
     --die-on-term \
+    --exit-on-reload \
     --vacuum \
     --disable-logging

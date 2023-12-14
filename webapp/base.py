@@ -1,6 +1,8 @@
+import sys
 import traceback
 
 from flask import Flask
+from psycopg_pool import PoolTimeout
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
@@ -11,7 +13,11 @@ def create_base_app() -> Flask:
     app = Flask(__name__)
 
     def on_start():
-        pool.open(wait=True)
+        try:
+            pool.open(wait=True, timeout=10)
+        except PoolTimeout:
+            print('Failed to connect to the database: Timeout')
+            __abort()
 
     def on_stop():
         pool.close()
@@ -68,3 +74,13 @@ def __register_hooks(on_start, on_stop):
         import atexit
         on_start()
         atexit.register(on_stop)
+
+
+def __abort():
+    try:
+        import uwsgi
+        uwsgi.stop()
+    except ImportError:
+        pass
+
+    sys.exit(1)
