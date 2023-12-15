@@ -19,11 +19,13 @@ def on_startup():
         print('🚫 Failed to connect to the database: Timeout')
         sys.exit(4)
 
-    print(f'✅ Worker #{os.getpid()} is ready')
+    print(f'✅ Worker is ready (PID={os.getpid()})')
 
 
 def on_shutdown():
     pool.close()
+
+    print(f'⛔ Worker is shutting down (PID={os.getpid()})')
 
 
 @app.route('/')

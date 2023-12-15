@@ -14,4 +14,5 @@ CMD exec python -m gunicorn \
     --workers ${WORKERS_COUNT:-4} \
     --bind "0.0.0.0:${HTTP_PORT:-8080}" \
     --user gunicorn --group gunicorn \
+    --log-level error \
     webapp.app:app
