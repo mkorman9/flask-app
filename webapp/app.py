@@ -16,7 +16,7 @@ def on_startup():
     try:
         pool.open(wait=True, timeout=10)
     except PoolTimeout:
-        print('Failed to connect to the database: Timeout')
+        print('🚫 Failed to connect to the database: Timeout')
         sys.exit(4)
 
     print(f'✅ Worker #{os.getpid()} is ready')
