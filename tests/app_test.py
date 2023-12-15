@@ -46,6 +46,28 @@ def test_delete_non_existing_item(client):
     assert message['type'] == 'ItemNotFound'
 
 
+@pytest.mark.usefixtures('flask_app', 'client')
+def test_update_item(client):
+    post_response, item_id = post_item(client, 'Test Item #3')
+    assert post_response.status_code == 200
+
+    updated_content = 'Updated Item'
+    put_response, _ = update_item(client, item_id, updated_content)
+    assert put_response.status_code == 200
+
+    get_response, items = get_all_items(client)
+    assert get_response.status_code == 200
+    assert len(items) == 1
+    assert items[0]['content'] == updated_content
+
+
+@pytest.mark.usefixtures('flask_app', 'client')
+def test_update_non_existing_item(client):
+    put_response, message = update_item(client, 'non-existing', 'Content')
+    assert put_response.status_code == 404
+    assert message['type'] == 'ItemNotFound'
+
+
 def get_all_items(client):
     response = client.get('/api/items')
     if response.status_code == 200:
@@ -64,6 +86,17 @@ def post_item(client, content):
     if response.status_code == 200:
         return response, json.loads(response.data)['id']
     return response, None
+
+
+def update_item(client, item_id, content):
+    response = client.put(
+        f'/api/items/{item_id}',
+        data=json.dumps({
+            'content': content
+        }),
+        content_type='application/json'
+    )
+    return response, json.loads(response.data)
 
 
 def delete_item(client, item_id):

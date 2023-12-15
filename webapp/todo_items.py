@@ -34,6 +34,15 @@ def delete_todo_item(item_id: str) -> bool:
         return False
 
 
+def update_todo_item(item_id: str, content: str) -> bool:
+    try:
+        with pool.connection() as conn:
+            with conn.execute('update todo_items set content = %s where id = %s', (content, item_id)) as result:
+                return result.rowcount > 0
+    except InvalidTextRepresentation:
+        return False
+
+
 def delete_all_todo_items():
     with pool.connection() as conn:
         conn.execute('delete from todo_items')

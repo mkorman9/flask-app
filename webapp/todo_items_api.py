@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from pydantic import BaseModel, constr
 
-from webapp.todo_items import find_todo_items, add_todo_item, delete_todo_item
+from webapp.todo_items import find_todo_items, add_todo_item, delete_todo_item, update_todo_item
 
 api = Blueprint('todo_items_api', __name__)
 
@@ -27,6 +27,22 @@ def create_item():
 def delete_item(item_id):
     deleted = delete_todo_item(item_id)
     if not deleted:
+        return {
+            'title': 'Item with given id does not exist',
+            'type': 'ItemNotFound'
+        }, 404
+
+    return {
+        'status': 'success'
+    }
+
+
+@api.put('/api/items/<item_id>')
+def update_item(item_id):
+    payload = TodoItemModel(**request.get_json())
+
+    updated = update_todo_item(item_id, payload.content)
+    if not updated:
         return {
             'title': 'Item with given id does not exist',
             'type': 'ItemNotFound'
