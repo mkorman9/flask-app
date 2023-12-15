@@ -18,7 +18,7 @@ def create_base_app() -> Flask:
 
     @app.errorhandler(Exception)
     def internal_server_error(e):
-        print('Uncaught exception:', traceback.format_exc())
+        print('🚫 Unhandled exception while processing the request:', traceback.format_exc())
         return {
             'title': 'Server has encountered an error when processing the request',
             'type': 'InternalServerError'
