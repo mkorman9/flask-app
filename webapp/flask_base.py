@@ -1,6 +1,4 @@
 import traceback
-from functools import reduce
-from typing import Collection
 
 from flask import Flask
 from pydantic import ValidationError
@@ -15,11 +13,7 @@ def create_base_app() -> Flask:
         return {
             'title': 'Provided request body contains schema violations',
             'type': 'ValidationError',
-            'cause': [{
-                'field': __extract_field(e['loc']),
-                'code': e['type'],
-                'message': e['msg']
-            } for e in e.errors()]
+            'cause': [{'location': e['loc'], 'code': e['type'], 'message': e['msg']} for e in e.errors()]
         }, 400
 
     @app.errorhandler(Exception)
@@ -52,11 +46,3 @@ def create_base_app() -> Flask:
         }, e.code
 
     return app
-
-
-def __extract_field(loc: Collection[any]) -> str:
-    return reduce(
-        lambda acc, part: acc + f'[{part}]' if isinstance(part, int) else (part if len(acc) == 0 else f'.{part}'),
-        loc,
-        ''
-    )
