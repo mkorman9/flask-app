@@ -27,8 +27,28 @@ def test_save_and_get_items(client):
 
 
 @pytest.mark.usefixtures('flask_app', 'client')
+def test_save_and_get_single_item(client):
+    content = 'Test Item #2'
+
+    post_response, item_id = post_item(client, content)
+    assert post_response.status_code == 200
+
+    get_response, item = get_item(client, item_id)
+    assert get_response.status_code == 200
+    assert item['id'] == item_id
+    assert item['content'] == content
+
+
+@pytest.mark.usefixtures('flask_app', 'client')
+def test_get_non_existing_item(client):
+    get_response, message = get_item(client, 'non-existing')
+    assert get_response.status_code == 404
+    assert message['type'] == 'ItemNotFound'
+
+
+@pytest.mark.usefixtures('flask_app', 'client')
 def test_save_and_delete_item(client):
-    post_response, item_id = post_item(client, 'Test Item #2')
+    post_response, item_id = post_item(client, 'Test Item #3')
     assert post_response.status_code == 200
 
     delete_response, _ = delete_item(client, item_id)
@@ -54,7 +74,7 @@ def test_delete_non_existing_item(client):
 
 @pytest.mark.usefixtures('flask_app', 'client')
 def test_update_item(client):
-    post_response, item_id = post_item(client, 'Test Item #3')
+    post_response, item_id = post_item(client, 'Test Item #4')
     assert post_response.status_code == 200
 
     updated_content = 'Updated Item'
@@ -76,7 +96,7 @@ def test_update_non_existing_item(client):
 
 @pytest.mark.usefixtures('flask_app', 'client')
 def test_update_item_with_empty_content(client):
-    post_response, item_id = post_item(client, 'Test Item #4')
+    post_response, item_id = post_item(client, 'Test Item #5')
     assert post_response.status_code == 200
 
     response, message = update_item(client, item_id, '')
@@ -89,6 +109,11 @@ def get_all_items(client):
     if response.status_code == 200:
         return response, json.loads(response.data)
     return response, None
+
+
+def get_item(client, item_id):
+    response = client.get(f'/api/items/{item_id}')
+    return response, json.loads(response.data)
 
 
 def post_item(client, content):

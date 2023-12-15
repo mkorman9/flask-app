@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import Generator, Optional
 
 from psycopg.errors import InvalidTextRepresentation
 from uuid_extensions import uuid7str
@@ -16,6 +16,18 @@ def find_todo_items() -> Generator[TodoItem, None, None]:
     with pool.connection() as conn:
         with conn.execute('select id, content from todo_items') as result:
             return (TodoItem(item_id=record[0], content=record[1]) for record in result.fetchall())
+
+
+def find_todo_item(item_id: str) -> Optional[TodoItem]:
+    try:
+        with pool.connection() as conn:
+            with conn.execute('select id, content from todo_items where id = %s', (item_id,)) as result:
+                item = result.fetchone()
+                if not item:
+                    return None
+                return TodoItem(item_id=item[0], content=item[1])
+    except InvalidTextRepresentation:
+        return None
 
 
 def add_todo_item(content: str) -> str:

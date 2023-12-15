@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from pydantic import BaseModel, constr
 
-from webapp.todo_items import find_todo_items, add_todo_item, delete_todo_item, update_todo_item
+from webapp.todo_items import find_todo_items, add_todo_item, delete_todo_item, update_todo_item, find_todo_item
 
 api = Blueprint('todo_items_api', __name__)
 
@@ -13,6 +13,18 @@ class TodoItemModel(BaseModel):
 @api.get('/api/items')
 def get_items():
     return [item.__dict__ for item in find_todo_items()]
+
+
+@api.get('/api/items/<item_id>')
+def get_item(item_id):
+    item = find_todo_item(item_id)
+    if not item:
+        return {
+            'title': 'Item with given id does not exist',
+            'type': 'ItemNotFound'
+        }, 404
+
+    return item.__dict__
 
 
 @api.post('/api/items')
