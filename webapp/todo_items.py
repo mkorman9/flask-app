@@ -1,5 +1,6 @@
 from typing import Generator
 
+from psycopg.errors import InvalidTextRepresentation
 from uuid_extensions import uuid7str
 
 from webapp.db import pool
@@ -22,6 +23,15 @@ def add_todo_item(content: str) -> str:
     with pool.connection() as conn:
         conn.execute('insert into todo_items (id, content) values (%s, %s)', (item_id, content))
         return item_id
+
+
+def delete_todo_item(item_id: str) -> bool:
+    try:
+        with pool.connection() as conn:
+            with conn.execute('delete from todo_items where id = %s', (item_id,)) as result:
+                return result.rowcount > 0
+    except InvalidTextRepresentation:
+        return False
 
 
 def delete_all_todo_items():

@@ -36,6 +36,11 @@ def create_base_app() -> Flask:
                 'title': 'The request resource was not found',
                 'type': 'NotFound'
             }, 404
+        elif e.code == 405:
+            return {
+                'title': 'Requested method is not allowed',
+                'type': 'MethodNotAllowed'
+            }, 405
         elif e.code == 415:
             return {
                 'title': 'Provided request body format was not recognised',

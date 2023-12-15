@@ -17,13 +17,33 @@ def clear_database():
 def test_save_and_get_items(client):
     content = 'Test Item #1'
 
-    post_response = post_item(client, content)
+    post_response, _ = post_item(client, content)
     assert post_response.status_code == 200
 
     get_response, items = get_all_items(client)
     assert get_response.status_code == 200
     assert len(items) == 1
     assert items[0]['content'] == content
+
+
+@pytest.mark.usefixtures('flask_app', 'client')
+def test_save_and_delete_item(client):
+    post_response, item_id = post_item(client, 'Test Item #2')
+    assert post_response.status_code == 200
+
+    delete_response, _ = delete_item(client, item_id)
+    assert delete_response.status_code == 200
+
+    get_response, items = get_all_items(client)
+    assert get_response.status_code == 200
+    assert len(items) == 0
+
+
+@pytest.mark.usefixtures('flask_app', 'client')
+def test_delete_non_existing_item(client):
+    delete_response, message = delete_item(client, 'non-existing')
+    assert delete_response.status_code == 404
+    assert message['type'] == 'ItemNotFound'
 
 
 def get_all_items(client):
@@ -34,10 +54,18 @@ def get_all_items(client):
 
 
 def post_item(client, content):
-    return client.post(
+    response = client.post(
         '/api/items',
         data=json.dumps({
             'content': content
         }),
         content_type='application/json'
     )
+    if response.status_code == 200:
+        return response, json.loads(response.data)['id']
+    return response, None
+
+
+def delete_item(client, item_id):
+    response = client.delete(f'/api/items/{item_id}')
+    return response, json.loads(response.data)
