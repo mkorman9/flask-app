@@ -13,7 +13,7 @@ def create_base_app() -> Flask:
         return {
             'title': 'Provided request body contains schema violations',
             'type': 'ValidationError',
-            'cause': [{'field': '.'.join(e['loc']), 'message': e['msg']} for e in e.errors()]
+            'cause': [{'field': '.'.join(e['loc']), 'code': e['type'], 'message': e['msg']} for e in e.errors()]
         }, 400
 
     @app.errorhandler(Exception)
