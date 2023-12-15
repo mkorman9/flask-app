@@ -4,9 +4,9 @@ import sys
 
 from psycopg_pool import PoolTimeout
 
-from webapp.db import pool
-from webapp.flask.base import create_base_app
 from webapp import todo_items_api
+from webapp.db import pool
+from webapp.flask_base import create_base_app
 
 app = create_base_app()
 
