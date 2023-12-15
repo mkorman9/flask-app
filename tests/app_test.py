@@ -40,6 +40,12 @@ def test_save_and_delete_item(client):
 
 
 @pytest.mark.usefixtures('flask_app', 'client')
+def test_save_empty_item(client):
+    response, message = post_item(client, '')
+    assert response.status_code == 400
+
+
+@pytest.mark.usefixtures('flask_app', 'client')
 def test_delete_non_existing_item(client):
     delete_response, message = delete_item(client, 'non-existing')
     assert delete_response.status_code == 404
@@ -66,6 +72,16 @@ def test_update_non_existing_item(client):
     put_response, message = update_item(client, 'non-existing', 'Content')
     assert put_response.status_code == 404
     assert message['type'] == 'ItemNotFound'
+
+
+@pytest.mark.usefixtures('flask_app', 'client')
+def test_update_item_with_empty_content(client):
+    post_response, item_id = post_item(client, 'Test Item #4')
+    assert post_response.status_code == 200
+
+    response, message = update_item(client, item_id, '')
+    assert response.status_code == 400
+    assert message['type'] == 'ValidationError'
 
 
 def get_all_items(client):
