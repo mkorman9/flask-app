@@ -19,4 +19,5 @@ jobs:
           cache: 'pip'
 
       - run: make config
+      - run: make lint
       - run: make test

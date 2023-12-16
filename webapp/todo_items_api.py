@@ -1,7 +1,13 @@
 from flask import Blueprint, request
 from pydantic import BaseModel, constr
 
-from webapp.todo_items import find_todo_items_page, add_todo_item, delete_todo_item, update_todo_item, find_todo_item
+from webapp.todo_items import (
+    find_todo_items_page,
+    add_todo_item,
+    delete_todo_item,
+    update_todo_item,
+    find_todo_item
+)
 
 api = Blueprint('todo_items_api', __name__)
 

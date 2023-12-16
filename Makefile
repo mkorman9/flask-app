@@ -10,3 +10,6 @@ run:
 
 test:
 	@$(venv)/bin/python -m pytest -v -s
+
+lint:
+	@$(venv)/bin/python -m flake8 webapp

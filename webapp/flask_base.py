@@ -15,14 +15,22 @@ def create_base_app() -> Flask:
         return {
             'title': 'Provided request body contains schema violations',
             'type': 'ValidationError',
-            'cause': [{'location': e['loc'], 'code': e['type'], 'message': e['msg']} for e in e.errors()]
+            'cause': [{
+                'location': e['loc'],
+                'code': e['type'],
+                'message': e['msg']
+            } for e in e.errors()]
         }, 400
 
     @app.errorhandler(Exception)
     def internal_server_error(e):
-        print('🚫 Unhandled exception while processing the request:', traceback.format_exc())
+        print(
+            '🚫 Unhandled exception while processing the request:',
+            traceback.format_exc()
+        )
         return {
-            'title': 'Server has encountered an error when processing the request',
+            'title':
+                'Server has encountered an error when processing the request',
             'type': 'InternalServerError'
         }, 500
 
