@@ -15,10 +15,10 @@ class TodoItem(object):
 
 class TodoItemsPage(object):
     def __init__(
-            self,
-            data: List[TodoItem],
-            page_size: int,
-            next_page_token: Optional[uuid.UUID] = None
+        self,
+        data: List[TodoItem],
+        page_size: int,
+        next_page_token: Optional[uuid.UUID] = None
     ):
         self.data = data
         self.page_size = page_size
@@ -26,26 +26,28 @@ class TodoItemsPage(object):
 
 
 def find_todo_items_page(
-        page_size: int,
-        page_token: Optional[str] = None
+    page_size: int,
+    page_token: Optional[str] = None
 ) -> TodoItemsPage:
-    try:
-        with pool.connection() as conn:
-            if page_token:
-                query = (
-                    'select id, content from todo_items'
-                    ' where id > %s limit %s',
-                    (page_token, page_size,)
-                )
-            else:
-                query = (
-                    'select id, content from todo_items limit %s',
-                    (page_size,)
-                )
+    with pool.connection() as conn:
+        if page_token:
+            query = (
+                'select id, content from todo_items where id > %s limit %s',
+                (page_token, page_size,)
+            )
+        else:
+            query = (
+                'select id, content from todo_items limit %s',
+                (page_size,)
+            )
 
+        try:
             with conn.execute(*query) as result:
                 data = [
-                    TodoItem(item_id=record[0], content=record[1])
+                    TodoItem(
+                        item_id=record[0],
+                        content=record[1]
+                    )
                     for record in result.fetchall()
                 ]
 
@@ -59,20 +61,20 @@ def find_todo_items_page(
                     page_size=page_size,
                     next_page_token=next_page_token
                 )
-    except InvalidTextRepresentation:
-        return TodoItemsPage(
-            data=[],
-            page_size=page_size,
-            next_page_token=None
-        )
+        except InvalidTextRepresentation:
+            return TodoItemsPage(
+                data=[],
+                page_size=page_size,
+                next_page_token=None
+            )
 
 
 def find_todo_item(item_id: str) -> Optional[TodoItem]:
     try:
         with pool.connection() as conn:
             with conn.execute(
-                    'select id, content from todo_items where id = %s',
-                    (item_id,)
+                'select id, content from todo_items where id = %s',
+                (item_id,)
             ) as result:
                 item = result.fetchone()
                 if not item:
@@ -96,8 +98,8 @@ def delete_todo_item(item_id: str) -> bool:
     try:
         with pool.connection() as conn:
             with conn.execute(
-                    'delete from todo_items where id = %s',
-                    (item_id,)
+                'delete from todo_items where id = %s',
+                (item_id,)
             ) as result:
                 return result.rowcount > 0
     except InvalidTextRepresentation:
@@ -108,8 +110,8 @@ def update_todo_item(item_id: str, content: str) -> bool:
     try:
         with pool.connection() as conn:
             with conn.execute(
-                    'update todo_items set content = %s where id = %s',
-                    (content, item_id)
+                'update todo_items set content = %s where id = %s',
+                (content, item_id)
             ) as result:
                 return result.rowcount > 0
     except InvalidTextRepresentation:

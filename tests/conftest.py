@@ -25,10 +25,15 @@ def pytest_configure(config):
     )
 
     __postgres.start()
-    wait_for_logs(__postgres, 'database system is ready to accept connections')
+    wait_for_logs(
+        __postgres,
+        'database system is ready to accept connections'
+    )
 
-    db_host_port = f'{__postgres.get_container_host_ip()}:{__postgres.get_exposed_port(5432)}'
-    os.environ['DB_URL'] = f'postgresql://{db_user}:{db_password}@{db_host_port}/{db_name}'
+    host = __postgres.get_container_host_ip()
+    port = __postgres.get_exposed_port(5432)
+    conn_str = f'{db_user}:{db_password}@{host}:{port}/{db_name}'
+    os.environ['DB_URL'] = f'postgresql://{conn_str}'
 
 
 def pytest_unconfigure(config):
