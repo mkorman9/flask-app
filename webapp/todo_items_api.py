@@ -18,7 +18,7 @@ class TodoItemModel(BaseModel):
 
 @api.get('/api/items')
 def get_items():
-    page_size = request.args.get('page_size', default=10, type=int)
+    page_size = request.args.get('page_size', type=int, default=10)
     page_token = request.args.get('page_token', type=str)
 
     page = find_todo_items_page(page_size, page_token)
