@@ -14,6 +14,7 @@ app = create_base_app()
 def on_startup():
     # open postgres connection pool
     try:
+        print(f'⌛ Connecting to the database (PID={os.getpid()})')
         pool.open(wait=True, timeout=10)
     except PoolTimeout:
         print('🚫 Failed to connect to the database: Timeout')

@@ -11,5 +11,6 @@ pool = ConnectionPool(
     min_size=config.DB_POOL_MIN,
     max_size=config.DB_POOL_MAX,
     open=False,
-    reconnect_timeout=5
+    reconnect_timeout=30,
+    timeout=10
 )
