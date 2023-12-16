@@ -14,7 +14,17 @@ class TodoItemModel(BaseModel):
 def get_items():
     page_size = request.args.get('page_size', default=10, type=int)
     page_token = request.args.get('page_token', default=None, type=str)
-    return find_todo_items_page(page_size, page_token).__dict__
+
+    page = find_todo_items_page(page_size, page_token)
+
+    return {
+        'data': [{
+            'id': str(item.item_id),
+            'content': item.content
+        } for item in page.data],
+        'page_size': page.page_size,
+        'next_page_token': page.next_page_token
+    }
 
 
 @api.get('/api/items/<item_id>')
@@ -26,7 +36,10 @@ def get_item(item_id):
             'type': 'ItemNotFound'
         }, 404
 
-    return item.__dict__
+    return {
+        'id': str(item.item_id),
+        'content': item.content
+    }
 
 
 @api.post('/api/items')

@@ -35,7 +35,7 @@ def test_save_and_get_single_item(client):
 
     get_response, item = get_item(client, item_id)
     assert get_response.status_code == 200
-    assert item['item_id'] == item_id
+    assert item['id'] == item_id
     assert item['content'] == content
 
 

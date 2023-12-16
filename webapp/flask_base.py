@@ -1,16 +1,12 @@
-import json
 import traceback
 
-import jsonpickle
 from flask import Flask
-from flask.json.provider import JSONProvider
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
 
 def create_base_app() -> Flask:
     app = Flask(__name__)
-    app.json = JsonPickleProvider(app)
 
     __disable_gevent_exception_stream()
 
@@ -57,17 +53,6 @@ def create_base_app() -> Flask:
         }, e.code
 
     return app
-
-
-class JsonPickleProvider(JSONProvider):
-    def __init__(self, app: Flask):
-        super().__init__(app)
-
-    def dumps(self, obj, *args, **kwargs):
-        return jsonpickle.dumps(obj, unpicklable=False, *args, **kwargs)
-
-    def loads(self, s, *args, **kwargs):
-        return json.loads(s, *args, **kwargs)
 
 
 def __disable_gevent_exception_stream():
