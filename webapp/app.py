@@ -1,8 +1,5 @@
 import atexit
 import os
-import sys
-
-from psycopg_pool import PoolTimeout
 
 from webapp import todo_items_api
 from webapp.db import pool
@@ -12,13 +9,7 @@ app = create_base_app()
 
 
 def on_startup():
-    # open postgres connection pool
-    try:
-        print(f'⌛ Connecting to the database (PID={os.getpid()})')
-        pool.open(wait=True, timeout=10)
-    except PoolTimeout:
-        print('🚫 Failed to connect to the database: Timeout')
-        sys.exit(4)
+    pool.open()
 
     print(f'✅ Worker is ready (PID={os.getpid()})')
 
