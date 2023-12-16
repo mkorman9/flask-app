@@ -4,7 +4,7 @@ from psycopg_pool import ConnectionPool
 
 from webapp.config import config
 
-logging.getLogger("psycopg.pool").setLevel('ERROR')
+logging.getLogger('psycopg.pool').setLevel('ERROR')
 
 
 def __reconnect_failed(p):
