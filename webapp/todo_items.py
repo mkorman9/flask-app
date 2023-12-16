@@ -76,10 +76,10 @@ def find_todo_item(item_id: str) -> Optional[TodoItem]:
                 'select id, content from todo_items where id = %s',
                 (item_id,)
             ) as result:
-                item = result.fetchone()
-                if not item:
+                record = result.fetchone()
+                if not record:
                     return None
-                return TodoItem(item_id=item[0], content=item[1])
+                return TodoItem(item_id=record[0], content=record[1])
         except InvalidTextRepresentation:
             return None
 
