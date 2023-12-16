@@ -27,8 +27,36 @@ def test_save_and_get_items(client):
 
 
 @pytest.mark.usefixtures('flask_app', 'client')
+def test_save_and_paginate_items(client):
+    content1 = 'Test Item #1'
+    content2 = 'Test Item #2'
+
+    post_response1, item_id1 = post_item(client, content1)
+    assert post_response1.status_code == 200
+    post_response2, item_id2 = post_item(client, content2)
+    assert post_response2.status_code == 200
+
+    get_response1, page1 = get_items_page(
+        client,
+        page_size=1
+    )
+    assert get_response1.status_code == 200
+    assert len(page1['data']) == 1
+    assert page1['data'][0]['content'] == content1
+
+    get_response2, page2 = get_items_page(
+        client,
+        page_size=1,
+        page_token=item_id1
+    )
+    assert get_response2.status_code == 200
+    assert len(page2['data']) == 1
+    assert page2['data'][0]['content'] == content2
+
+
+@pytest.mark.usefixtures('flask_app', 'client')
 def test_save_and_get_single_item(client):
-    content = 'Test Item #2'
+    content = 'Test Item #1'
 
     post_response, item_id = post_item(client, content)
     assert post_response.status_code == 200
@@ -48,7 +76,7 @@ def test_get_non_existing_item(client):
 
 @pytest.mark.usefixtures('flask_app', 'client')
 def test_save_and_delete_item(client):
-    post_response, item_id = post_item(client, 'Test Item #3')
+    post_response, item_id = post_item(client, 'Test Item #1')
     assert post_response.status_code == 200
 
     delete_response, _ = delete_item(client, item_id)
@@ -74,7 +102,7 @@ def test_delete_non_existing_item(client):
 
 @pytest.mark.usefixtures('flask_app', 'client')
 def test_update_item(client):
-    post_response, item_id = post_item(client, 'Test Item #4')
+    post_response, item_id = post_item(client, 'Test Item #1')
     assert post_response.status_code == 200
 
     updated_content = 'Updated Item'
@@ -96,7 +124,7 @@ def test_update_non_existing_item(client):
 
 @pytest.mark.usefixtures('flask_app', 'client')
 def test_update_item_with_empty_content(client):
-    post_response, item_id = post_item(client, 'Test Item #5')
+    post_response, item_id = post_item(client, 'Test Item #1')
     assert post_response.status_code == 200
 
     response, message = update_item(client, item_id, '')
@@ -104,8 +132,12 @@ def test_update_item_with_empty_content(client):
     assert message['type'] == 'ValidationError'
 
 
-def get_items_page(client):
-    response = client.get('/api/items')
+def get_items_page(client, page_size = None, page_token = None):
+    query = {
+        'page_size': page_size,
+        'page_token': page_token
+    }
+    response = client.get('/api/items', query_string=query)
     if response.status_code == 200:
         return response, json.loads(response.data)
     return response, None
