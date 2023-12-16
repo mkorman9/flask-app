@@ -11,7 +11,7 @@ COPY --chown=gunicorn:gunicorn requirements.txt /runtime/requirements.txt
 RUN pip install -r requirements.txt
 
 CMD exec python -m gunicorn \
-    --workers ${WORKERS_COUNT:-4} --worker-class gevent \
+    --workers ${WORKERS_COUNT:-4} --worker-class sync \
     --bind "0.0.0.0:${HTTP_PORT:-8080}" \
     --user gunicorn --group gunicorn \
     --log-level error \
