@@ -2,7 +2,7 @@ import uuid
 from typing import Optional, List
 
 from psycopg.errors import InvalidTextRepresentation
-from uuid_extensions import uuid7str
+from uuid_extensions import uuid7
 
 from webapp.db import pool
 
@@ -84,12 +84,12 @@ def find_todo_item(item_id: str) -> Optional[TodoItem]:
         return None
 
 
-def add_todo_item(content: str) -> str:
-    item_id = uuid7str()
+def add_todo_item(content: str) -> uuid.UUID:
+    item_id = uuid7()
     with pool.connection() as conn:
         conn.execute(
             'insert into todo_items (id, content) values (%s, %s)',
-            (item_id, content)
+            (str(item_id), content)
         )
         return item_id
 

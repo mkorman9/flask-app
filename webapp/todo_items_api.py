@@ -53,7 +53,7 @@ def create_item():
     payload = TodoItemModel(**request.get_json())
 
     item_id = add_todo_item(payload.content)
-    return {'id': item_id}
+    return {'id': str(item_id)}
 
 
 @api.delete('/api/items/<item_id>')
