@@ -65,9 +65,7 @@ def delete_item(item_id):
             'type': 'ItemNotFound'
         }, 404
 
-    return {
-        'status': 'success'
-    }
+    return {'status': 'success'}
 
 
 @api.put('/api/items/<item_id>')
@@ -81,6 +79,4 @@ def update_item(item_id):
             'type': 'ItemNotFound'
         }, 404
 
-    return {
-        'status': 'success'
-    }
+    return {'status': 'success'}
