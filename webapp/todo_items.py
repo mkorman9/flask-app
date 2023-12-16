@@ -70,8 +70,8 @@ def find_todo_items_page(
 
 
 def find_todo_item(item_id: str) -> Optional[TodoItem]:
-    try:
-        with pool.connection() as conn:
+    with pool.connection() as conn:
+        try:
             with conn.execute(
                 'select id, content from todo_items where id = %s',
                 (item_id,)
@@ -80,8 +80,8 @@ def find_todo_item(item_id: str) -> Optional[TodoItem]:
                 if not item:
                     return None
                 return TodoItem(item_id=item[0], content=item[1])
-    except InvalidTextRepresentation:
-        return None
+        except InvalidTextRepresentation:
+            return None
 
 
 def add_todo_item(content: str) -> uuid.UUID:

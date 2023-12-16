@@ -1,5 +1,7 @@
 venv ?= .venv
 
+.DEFAULT_GOAL := all
+
 config:
 	@rm -rf $(venv) && python -m venv $(venv)
 	@$(venv)/bin/pip install -r requirements.txt
@@ -13,3 +15,5 @@ test:
 
 lint:
 	@$(venv)/bin/python -m flake8 webapp
+
+all: lint test
