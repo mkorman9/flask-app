@@ -1,4 +1,4 @@
-from typing import Generator, Optional
+from typing import Optional, List
 
 from psycopg.errors import InvalidTextRepresentation
 from uuid_extensions import uuid7str
@@ -6,16 +6,33 @@ from uuid_extensions import uuid7str
 from webapp.db import pool
 
 
-class TodoItem:
-    def __init__(self, item_id, content):
-        self.id = item_id
+class TodoItem(object):
+    def __init__(self, item_id: str, content: str):
+        self.item_id = item_id
         self.content = content
 
 
-def find_todo_items() -> Generator[TodoItem, None, None]:
-    with pool.connection() as conn:
-        with conn.execute('select id, content from todo_items') as result:
-            return (TodoItem(item_id=record[0], content=record[1]) for record in result.fetchall())
+class TodoItemsPage(object):
+    def __init__(self, data: List[TodoItem], page_size: int, next_page_token: Optional[str] = None):
+        self.data = data
+        self.page_size = page_size
+        self.next_page_token = next_page_token
+
+
+def find_todo_items_page(page_size: int, page_token: Optional[str] = None) -> TodoItemsPage:
+    try:
+        with pool.connection() as conn:
+            if page_token:
+                query = ('select id, content from todo_items where id > %s limit %s', (page_token, page_size,))
+            else:
+                query = ('select id, content from todo_items limit %s', (page_size,))
+
+            with conn.execute(*query) as result:
+                data = [TodoItem(item_id=str(record[0]), content=record[1]) for record in result.fetchall()]
+                next_page_token = str(data[len(data) - 1].item_id) if len(data) > 0 else None
+                return TodoItemsPage(data=data, page_size=page_size, next_page_token=next_page_token)
+    except InvalidTextRepresentation:
+        return TodoItemsPage(data=[], page_size=page_size, next_page_token=None)
 
 
 def find_todo_item(item_id: str) -> Optional[TodoItem]:
@@ -25,7 +42,7 @@ def find_todo_item(item_id: str) -> Optional[TodoItem]:
                 item = result.fetchone()
                 if not item:
                     return None
-                return TodoItem(item_id=item[0], content=item[1])
+                return TodoItem(item_id=str(item[0]), content=item[1])
     except InvalidTextRepresentation:
         return None
 

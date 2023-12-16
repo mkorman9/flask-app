@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from pydantic import BaseModel, constr
 
-from webapp.todo_items import find_todo_items, add_todo_item, delete_todo_item, update_todo_item, find_todo_item
+from webapp.todo_items import find_todo_items_page, add_todo_item, delete_todo_item, update_todo_item, find_todo_item
 
 api = Blueprint('todo_items_api', __name__)
 
@@ -12,7 +12,9 @@ class TodoItemModel(BaseModel):
 
 @api.get('/api/items')
 def get_items():
-    return [item.__dict__ for item in find_todo_items()]
+    page_size = request.args.get('page_size', default=10, type=int)
+    page_token = request.args.get('page_token', default=None, type=str)
+    return find_todo_items_page(page_size, page_token).__dict__
 
 
 @api.get('/api/items/<item_id>')

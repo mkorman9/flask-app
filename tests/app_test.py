@@ -20,10 +20,10 @@ def test_save_and_get_items(client):
     post_response, _ = post_item(client, content)
     assert post_response.status_code == 200
 
-    get_response, items = get_all_items(client)
+    get_response, page = get_items_page(client)
     assert get_response.status_code == 200
-    assert len(items) == 1
-    assert items[0]['content'] == content
+    assert len(page['data']) == 1
+    assert page['data'][0]['content'] == content
 
 
 @pytest.mark.usefixtures('flask_app', 'client')
@@ -35,7 +35,7 @@ def test_save_and_get_single_item(client):
 
     get_response, item = get_item(client, item_id)
     assert get_response.status_code == 200
-    assert item['id'] == item_id
+    assert item['item_id'] == item_id
     assert item['content'] == content
 
 
@@ -54,9 +54,9 @@ def test_save_and_delete_item(client):
     delete_response, _ = delete_item(client, item_id)
     assert delete_response.status_code == 200
 
-    get_response, items = get_all_items(client)
+    get_response, page = get_items_page(client)
     assert get_response.status_code == 200
-    assert len(items) == 0
+    assert len(page['data']) == 0
 
 
 @pytest.mark.usefixtures('flask_app', 'client')
@@ -81,10 +81,10 @@ def test_update_item(client):
     put_response, _ = update_item(client, item_id, updated_content)
     assert put_response.status_code == 200
 
-    get_response, items = get_all_items(client)
+    get_response, page = get_items_page(client)
     assert get_response.status_code == 200
-    assert len(items) == 1
-    assert items[0]['content'] == updated_content
+    assert len(page['data']) == 1
+    assert page['data'][0]['content'] == updated_content
 
 
 @pytest.mark.usefixtures('flask_app', 'client')
@@ -104,7 +104,7 @@ def test_update_item_with_empty_content(client):
     assert message['type'] == 'ValidationError'
 
 
-def get_all_items(client):
+def get_items_page(client):
     response = client.get('/api/items')
     if response.status_code == 200:
         return response, json.loads(response.data)
