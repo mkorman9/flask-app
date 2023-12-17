@@ -5,8 +5,8 @@ from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
 
-def create_base_app() -> Flask:
-    app = Flask(__name__)
+def create_app_base(import_name: str) -> Flask:
+    app = Flask(import_name)
 
     __disable_gevent_exception_stream()
 

@@ -2,10 +2,10 @@ import atexit
 import os
 
 from webapp import todo_items_api
+from webapp.base import create_app_base
 from webapp.db import pool
-from webapp.flask_base import create_base_app
 
-app = create_base_app()
+app = create_app_base(__name__)
 
 
 def on_startup():
