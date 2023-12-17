@@ -8,8 +8,6 @@ from werkzeug.exceptions import HTTPException
 def create_app_base(import_name: str) -> Flask:
     app = Flask(import_name)
 
-    __disable_gevent_exception_stream()
-
     @app.errorhandler(ValidationError)
     def validation_error(e: ValidationError):
         return {
@@ -61,11 +59,3 @@ def create_app_base(import_name: str) -> Flask:
         }, e.code
 
     return app
-
-
-def __disable_gevent_exception_stream():
-    try:
-        from gevent import get_hub
-        get_hub().exception_stream = None
-    except ImportError:
-        pass
