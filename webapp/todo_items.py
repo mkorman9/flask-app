@@ -33,7 +33,7 @@ def find_todo_items_page(
         if page_token:
             query = (
                 'select id, content from todo_items where id > %s limit %s',
-                (page_token, page_size,)
+                (page_token, page_size)
             )
         else:
             query = (
