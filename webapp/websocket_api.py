@@ -12,17 +12,12 @@ class WebSocketContext(object):
         self.id = uuid.uuid4()
         self.ws = ws
         self.to_close = False
-        self.all_clients = {}
 
     def close(self):
         self.to_close = True
 
     def send(self, message: str | bytes):
         self.ws.send(message)
-
-    def broadcast(self, message: str | bytes):
-        for client in self.all_clients.values():
-            client.send(message)
 
 
 def on_connect(ctx: WebSocketContext):
@@ -44,13 +39,9 @@ def on_disconnect(ctx: WebSocketContext):
 
 
 def register(sock: Sock):
-    all_clients = {}
-
     @sock.route(WS_PATH)
     def websocket_endpoint(ws: Base):
         ctx = WebSocketContext(ws)
-        all_clients[ctx.id] = ctx
-        ctx.all_clients = all_clients
 
         on_connect(ctx)
 
@@ -62,6 +53,4 @@ def register(sock: Sock):
             on_message(ctx, message)
 
         ws.close()
-        del all_clients[ctx.id]
-
         on_disconnect(ctx)
