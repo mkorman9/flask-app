@@ -15,5 +15,6 @@ test:
 
 lint:
 	@$(venv)/bin/python -m flake8 webapp
+	@$(venv)/bin/python -m mypy webapp
 
 all: lint test

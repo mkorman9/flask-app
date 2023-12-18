@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional, List
+from typing import Optional, List, Tuple, Any
 
 from psycopg.errors import InvalidTextRepresentation
 from uuid_extensions import uuid7
@@ -31,7 +31,7 @@ def find_todo_items_page(
 ) -> TodoItemsPage:
     with pool.connection() as conn:
         if page_token:
-            query = (
+            query: Tuple[str, Tuple[Any, ...]] = (
                 'select id, content from todo_items where id > %s limit %s',
                 (page_token, page_size)
             )

@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, Field
 
 from webapp.todo_items import (
     find_todo_items_page,
@@ -13,7 +13,7 @@ api = Blueprint('todo_items_api', __name__)
 
 
 class TodoItemModel(BaseModel):
-    content: constr(min_length=1)
+    content: str = Field(min_length=1)
 
 
 @api.get('/api/items')
