@@ -1,8 +1,8 @@
-import traceback
-
 from flask import Flask
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
+
+from webapp.logger import log
 
 
 def create_app_base(import_name: str) -> Flask:
@@ -22,9 +22,9 @@ def create_app_base(import_name: str) -> Flask:
 
     @app.errorhandler(Exception)
     def internal_server_error(e):
-        print(
-            '🚫 Unhandled exception while processing the request:',
-            traceback.format_exc()
+        log.error(
+            '🚫 Unhandled exception while processing the request',
+            exc_info=e
         )
         return {
             'title':

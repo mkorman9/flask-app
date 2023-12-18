@@ -6,6 +6,8 @@ from pydantic import ValidationError, BaseModel
 
 
 class ConfigModel(BaseModel):
+    LOG_LEVEL: str = 'INFO'
+
     DB_URL: str
     DB_POOL_MIN: int = 1
     DB_POOL_MAX: int = 5

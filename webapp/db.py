@@ -3,12 +3,13 @@ import logging
 from psycopg_pool import ConnectionPool
 
 from webapp.config import config
+from webapp.logger import log
 
 logging.getLogger('psycopg.pool').setLevel('ERROR')
 
 
 def __reconnect_failed(p):
-    print('🚫 Reconnect to the database has failed')
+    log.error('🚫 Reconnect to the database has failed')
 
 
 pool = ConnectionPool(
