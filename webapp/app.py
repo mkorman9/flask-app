@@ -18,6 +18,17 @@ app = create_app_base(__name__)
 websockets = Sock(app)
 
 
+@app.route('/')
+def hello_world():
+    return {
+        'message': 'hello world'
+    }
+
+
+app.register_blueprint(todo_items_api.api)
+websocket_api.register(websockets)
+
+
 def on_startup():
     pool.open()
 
@@ -29,16 +40,6 @@ def on_shutdown():
 
     print(f'⛔ Worker is shutting down (PID={os.getpid()})')
 
-
-@app.route('/')
-def hello_world():
-    return {
-        'message': 'hello world'
-    }
-
-
-app.register_blueprint(todo_items_api.api)
-websocket_api.register(websockets)
 
 on_startup()
 atexit.register(on_shutdown)
