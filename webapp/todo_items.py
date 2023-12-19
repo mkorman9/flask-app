@@ -4,7 +4,7 @@ from typing import Optional, List, Tuple, Any
 from psycopg.errors import InvalidTextRepresentation
 from uuid_extensions import uuid7
 
-from webapp.db import pool
+from webapp import db
 
 
 class TodoItem(object):
@@ -29,7 +29,7 @@ def find_todo_items_page(
     page_size: int,
     page_token: Optional[str] = None
 ) -> TodoItemsPage:
-    with pool.connection() as conn:
+    with db.connection() as conn:
         if page_token:
             query: Tuple[str, Tuple[Any, ...]] = (
                 'select id, content from todo_items where id > %s limit %s',
@@ -70,7 +70,7 @@ def find_todo_items_page(
 
 
 def find_todo_item(item_id: str) -> Optional[TodoItem]:
-    with pool.connection() as conn:
+    with db.connection() as conn:
         try:
             with conn.execute(
                 'select id, content from todo_items where id = %s',
@@ -86,7 +86,7 @@ def find_todo_item(item_id: str) -> Optional[TodoItem]:
 
 def add_todo_item(content: str) -> uuid.UUID:
     item_id = uuid7()
-    with pool.connection() as conn:
+    with db.connection() as conn:
         conn.execute(
             'insert into todo_items (id, content) values (%s, %s)',
             (str(item_id), content)
@@ -95,7 +95,7 @@ def add_todo_item(content: str) -> uuid.UUID:
 
 
 def delete_todo_item(item_id: str) -> bool:
-    with pool.connection() as conn:
+    with db.connection() as conn:
         try:
             with conn.execute(
                 'delete from todo_items where id = %s',
@@ -107,7 +107,7 @@ def delete_todo_item(item_id: str) -> bool:
 
 
 def update_todo_item(item_id: str, content: str) -> bool:
-    with pool.connection() as conn:
+    with db.connection() as conn:
         try:
             with conn.execute(
                 'update todo_items set content = %s where id = %s',
@@ -119,5 +119,5 @@ def update_todo_item(item_id: str, content: str) -> bool:
 
 
 def delete_all_todo_items():
-    with pool.connection() as conn:
+    with db.connection() as conn:
         conn.execute('delete from todo_items')

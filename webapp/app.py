@@ -6,7 +6,7 @@ from flask_sock import Sock
 
 from webapp import todo_items_api, websocket_api
 from webapp.base import create_app_base
-from webapp.db import pool
+from webapp import db
 
 app = create_app_base(__name__)
 websockets = Sock(app)
@@ -24,13 +24,13 @@ websocket_api.register(websockets)
 
 
 def on_startup():
-    pool.open()
+    db.open_pool()
 
     logging.info('✅ Worker is ready (PID=%d)', os.getpid())
 
 
 def on_shutdown():
-    pool.close()
+    db.close_pool()
 
     logging.info('⛔ Worker is shutting down (PID=%d)', os.getpid())
 
