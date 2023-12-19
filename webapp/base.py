@@ -1,8 +1,21 @@
 import logging
 
+import gevent
 from flask import Flask
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
+
+from webapp.config import config
+
+
+def configure_logger():
+    logging.basicConfig(
+        level=config.LOG_LEVEL,
+        format='[%(levelname)s] %(message)s'
+    )
+
+    # Mute gevent exceptions
+    gevent.get_hub().exception_stream = None
 
 
 def create_app_base(import_name: str) -> Flask:
