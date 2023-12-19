@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from pydantic import BaseModel, Field
 
-from webapp.todo_items import (
+from webapp.todo_items.items import (
     find_todo_items_page,
     add_todo_item,
     delete_todo_item,
@@ -9,14 +9,14 @@ from webapp.todo_items import (
     find_todo_item
 )
 
-api = Blueprint('todo_items_api', __name__)
+blueprint = Blueprint('todo_items_api', __name__)
 
 
 class TodoItemModel(BaseModel):
     content: str = Field(min_length=1)
 
 
-@api.get('/api/items')
+@blueprint.get('/api/items')
 def get_items():
     page_size = request.args.get('page_size', type=int, default=10)
     page_token = request.args.get('page_token', type=str)
@@ -33,7 +33,7 @@ def get_items():
     }
 
 
-@api.get('/api/items/<item_id>')
+@blueprint.get('/api/items/<item_id>')
 def get_item(item_id):
     item = find_todo_item(item_id)
     if not item:
@@ -48,7 +48,7 @@ def get_item(item_id):
     }
 
 
-@api.post('/api/items')
+@blueprint.post('/api/items')
 def create_item():
     payload = TodoItemModel(**request.get_json())
 
@@ -56,7 +56,7 @@ def create_item():
     return {'id': str(item_id)}
 
 
-@api.delete('/api/items/<item_id>')
+@blueprint.delete('/api/items/<item_id>')
 def delete_item(item_id):
     deleted = delete_todo_item(item_id)
     if not deleted:
@@ -68,7 +68,7 @@ def delete_item(item_id):
     return {'status': 'success'}
 
 
-@api.put('/api/items/<item_id>')
+@blueprint.put('/api/items/<item_id>')
 def update_item(item_id):
     payload = TodoItemModel(**request.get_json())
 

@@ -3,7 +3,7 @@ import json
 import pytest
 
 from tests.fixtures import flask_app, client
-from webapp.todo_items import delete_all_todo_items
+from webapp.todo_items.items import delete_all_todo_items
 
 
 @pytest.fixture(autouse=True)
