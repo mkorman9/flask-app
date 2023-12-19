@@ -1,3 +1,4 @@
+import atexit
 import logging
 from typing import Optional
 
@@ -8,23 +9,28 @@ from webapp.config import get_config
 _pool: Optional[ConnectionPool] = None
 
 
-def open_pool():
+def connection():
     global _pool
 
-    logging.getLogger('psycopg.pool').setLevel('ERROR')
+    if not _pool:
+        logging.getLogger('psycopg.pool').setLevel('ERROR')
 
-    c = get_config()
-    _pool = ConnectionPool(
-        c.DB_URL,
-        min_size=c.DB_POOL_MIN,
-        max_size=c.DB_POOL_MAX,
-        timeout=10,
-        reconnect_failed=__reconnect_failed,
-        open=True
-    )
+        c = get_config()
+        _pool = ConnectionPool(
+            c.DB_URL,
+            min_size=c.DB_POOL_MIN,
+            max_size=c.DB_POOL_MAX,
+            timeout=10,
+            reconnect_failed=_reconnect_failed,
+            open=True
+        )
+
+        atexit.register(_close_pool)
+
+    return _pool.connection()
 
 
-def close_pool():
+def _close_pool():
     global _pool
 
     if not _pool:
@@ -34,14 +40,5 @@ def close_pool():
     _pool = None
 
 
-def connection():
-    global _pool
-
-    if not _pool:
-        raise RuntimeError('Pool is closed')
-
-    return _pool.connection()
-
-
-def __reconnect_failed(p):
+def _reconnect_failed(p):
     logging.error('🚫 Reconnect to the database has failed')
