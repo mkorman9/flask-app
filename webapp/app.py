@@ -5,10 +5,9 @@ import os
 from flask_sock import Sock
 
 from webapp import todo_items_api, websocket_api
-from webapp.base import configure_logger, create_app_base
+from webapp.base import create_app_base
 from webapp.db import pool
 
-configure_logger()
 app = create_app_base(__name__)
 websockets = Sock(app)
 
