@@ -1,17 +1,14 @@
 import atexit
+import logging
 import os
 
-import gevent
 from flask_sock import Sock
 
-from webapp import todo_items_api
-from webapp import websocket_api
+from webapp import logger, todo_items_api, websocket_api
 from webapp.base import create_app_base
 from webapp.db import pool
-from webapp.logger import log
 
-gevent.get_hub().exception_stream = None
-
+logger.configure()
 app = create_app_base(__name__)
 websockets = Sock(app)
 
@@ -30,13 +27,13 @@ websocket_api.register(websockets)
 def on_startup():
     pool.open()
 
-    log.info('✅ Worker is ready (PID=%d)', os.getpid())
+    logging.info('✅ Worker is ready (PID=%d)', os.getpid())
 
 
 def on_shutdown():
     pool.close()
 
-    log.info('⛔ Worker is shutting down (PID=%d)', os.getpid())
+    logging.info('⛔ Worker is shutting down (PID=%d)', os.getpid())
 
 
 on_startup()

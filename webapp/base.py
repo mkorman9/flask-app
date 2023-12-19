@@ -1,8 +1,8 @@
+import logging
+
 from flask import Flask
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
-
-from webapp.logger import log
 
 
 def create_app_base(import_name: str) -> Flask:
@@ -22,7 +22,7 @@ def create_app_base(import_name: str) -> Flask:
 
     @app.errorhandler(Exception)
     def internal_server_error(e):
-        log.error(
+        logging.error(
             '🚫 Unhandled exception while processing the request',
             exc_info=e
         )
