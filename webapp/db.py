@@ -20,6 +20,7 @@ def open_pool():
         max_size=c.DB_POOL_MAX,
         timeout=10,
         reconnect_failed=__reconnect_failed,
+        open=True
     )
 
 
