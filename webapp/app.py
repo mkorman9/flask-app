@@ -1,11 +1,16 @@
 from flask_sock import Sock
 
-from webapp.base import create_app_base
+from webapp.flask_base_app import create_flask_base_app
+from webapp.config import get_config
 from webapp.healthcheck import healthcheck_api
+from webapp.logger import configure_logger
 from webapp.todo_items import todo_items_api
 from webapp.websocket import websocket_api
 
-app = create_app_base(__name__)
+configure_logger()
+_ = get_config()
+
+app = create_flask_base_app(__name__)
 websockets = Sock(app)
 
 app.register_blueprint(healthcheck_api.blueprint)

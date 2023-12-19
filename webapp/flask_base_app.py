@@ -4,15 +4,9 @@ from flask import Flask
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
-from webapp.config import get_config
-from webapp.logger import configure_logger
 
-
-def create_app_base(import_name: str) -> Flask:
+def create_flask_base_app(import_name: str) -> Flask:
     app = Flask(import_name)
-
-    configure_logger()
-    get_config()
 
     @app.errorhandler(ValidationError)
     def validation_error(e: ValidationError):
