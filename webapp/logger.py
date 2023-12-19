@@ -5,7 +5,7 @@ from webapp.config import config
 logging.basicConfig(level=logging.NOTSET)
 logging.root.handlers.clear()
 
-__formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(message)s')
+__formatter = logging.Formatter('[%(levelname)s] %(message)s')
 
 __handler = logging.StreamHandler()
 __handler.setLevel(config.LOG_LEVEL)
