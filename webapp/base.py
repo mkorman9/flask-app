@@ -1,17 +1,19 @@
 import logging
+import os
 
 import gevent
 from flask import Flask
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
 
-from webapp.config import config
+from webapp.config import load_config
 
 
 def create_app_base(import_name: str) -> Flask:
     app = Flask(import_name)
 
     _configure_logger()
+    load_config()
 
     @app.errorhandler(ValidationError)
     def validation_error(e: ValidationError):
@@ -68,7 +70,7 @@ def create_app_base(import_name: str) -> Flask:
 
 def _configure_logger():
     logging.basicConfig(
-        level=config.LOG_LEVEL,
+        level=os.getenv('LOG_LEVEL', 'INFO'),
         format='[%(levelname)s] %(message)s'
     )
 

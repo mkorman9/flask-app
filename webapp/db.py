@@ -3,7 +3,7 @@ from typing import Optional
 
 from psycopg_pool import ConnectionPool
 
-from webapp.config import config
+from webapp.config import get_config
 
 _pool: Optional[ConnectionPool] = None
 
@@ -13,10 +13,11 @@ def open_pool():
 
     logging.getLogger('psycopg.pool').setLevel('ERROR')
 
+    c = get_config()
     _pool = ConnectionPool(
-        config.DB_URL,
-        min_size=config.DB_POOL_MIN,
-        max_size=config.DB_POOL_MAX,
+        c.DB_URL,
+        min_size=c.DB_POOL_MIN,
+        max_size=c.DB_POOL_MAX,
         timeout=10,
         reconnect_failed=__reconnect_failed,
     )
