@@ -33,7 +33,7 @@ def pytest_configure(config):
     host = __postgres.get_container_host_ip()
     port = __postgres.get_exposed_port(5432)
     conn_str = f'{db_user}:{db_password}@{host}:{port}/{db_name}'
-    os.environ['DB_URL'] = f'postgresql://{conn_str}'
+    os.environ['DB_URL'] = f'postgresql+psycopg://{conn_str}'
 
 
 def pytest_unconfigure(config):

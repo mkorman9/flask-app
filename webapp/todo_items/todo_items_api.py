@@ -25,7 +25,7 @@ def get_items():
 
     return {
         'data': [{
-            'id': str(item.item_id),
+            'id': str(item.id),
             'content': item.content
         } for item in page.data],
         'page_size': page.page_size,
@@ -43,7 +43,7 @@ def get_item(item_id):
         }, 404
 
     return {
-        'id': str(item.item_id),
+        'id': str(item.id),
         'content': item.content
     }
 

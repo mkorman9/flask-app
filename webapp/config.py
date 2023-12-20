@@ -9,8 +9,7 @@ from pydantic import ValidationError, BaseModel
 
 class ConfigModel(BaseModel):
     DB_URL: str
-    DB_POOL_MIN: int = 1
-    DB_POOL_MAX: int = 5
+    DB_POOL_SIZE: int = 4
 
 
 _config: Optional[ConfigModel] = None

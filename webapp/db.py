@@ -1,50 +1,41 @@
 import atexit
-import logging
 from typing import Optional
 
-from psycopg_pool import ConnectionPool
+from sqlalchemy import create_engine, Engine
+from sqlalchemy.orm import Session
 
 from webapp.config import get_config
 
-_pool: Optional[ConnectionPool] = None
+_engine: Optional[Engine] = None
 
 
-def connection():
-    global _pool
+def session():
+    global _engine
 
-    if not _pool:
-        raise RuntimeError('Pool is closed')
+    if not _engine:
+        raise RuntimeError('DB engine is closed')
 
-    return _pool.connection()
+    return Session(_engine)
 
 
 def open_pool():
-    global _pool
-
-    logging.getLogger('psycopg.pool').setLevel('ERROR')
+    global _engine
 
     c = get_config()
-    _pool = ConnectionPool(
+    _engine = create_engine(
         c.DB_URL,
-        min_size=c.DB_POOL_MIN,
-        max_size=c.DB_POOL_MAX,
-        timeout=10,
-        reconnect_failed=_reconnect_failed,
-        open=True
+        pool_size=c.DB_POOL_SIZE,
+        pool_timeout=10
     )
 
     atexit.register(_close_pool)
 
 
 def _close_pool():
-    global _pool
+    global _engine
 
-    if not _pool:
-        raise RuntimeError('Pool is closed')
+    if not _engine:
+        raise RuntimeError('DB engine is closed')
 
-    _pool.close()
-    _pool = None
-
-
-def _reconnect_failed(p):
-    logging.error('🚫 Reconnect to the database has failed')
+    _engine.dispose()
+    _engine = None
