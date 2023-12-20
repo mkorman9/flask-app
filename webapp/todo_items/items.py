@@ -1,11 +1,8 @@
 import uuid
 from typing import Optional, List
 
-from psycopg.errors import InvalidTextRepresentation
 from sqlalchemy import String
-from sqlalchemy.exc import DataError
-from sqlalchemy.orm import Mapped, mapped_column, \
-    declarative_base
+from sqlalchemy.orm import Mapped, mapped_column, declarative_base
 from uuid_extensions import uuid7
 
 from webapp import db
@@ -37,42 +34,41 @@ def find_todo_items_page(
     with db.session() as session:
         query = session.query(TodoItem)
         if page_token:
-            query = query.filter(TodoItem.id > page_token)
-
-        query = query.limit(page_size)
-
-        try:
-            data = query.all()
-
-            if len(data) > 0:
-                next_page_token = data[len(data) - 1].id
-            else:
-                next_page_token = None
-
-            return TodoItemsPage(
-                data=data,
-                page_size=page_size,
-                next_page_token=next_page_token
-            )
-        except DataError as e:
-            if isinstance(e.orig, InvalidTextRepresentation):
+            try:
+                page_token_uuid = uuid.UUID(page_token)
+            except ValueError:
                 return TodoItemsPage(
                     data=[],
                     page_size=page_size,
                     next_page_token=None
                 )
-            raise e
+
+            query = query.filter(TodoItem.id > page_token_uuid)
+
+        query = query.limit(page_size)
+        data = query.all()
+
+        if len(data) > 0:
+            next_page_token = data[len(data) - 1].id
+        else:
+            next_page_token = None
+
+        return TodoItemsPage(
+            data=data,
+            page_size=page_size,
+            next_page_token=next_page_token
+        )
 
 
 def find_todo_item(item_id: str) -> Optional[TodoItem]:
+    try:
+        item_id_uuid = uuid.UUID(item_id)
+    except ValueError:
+        return None
+
     with db.session() as session:
-        try:
-            query = session.query(TodoItem).filter(TodoItem.id == item_id)
-            return query.one_or_none()
-        except DataError as e:
-            if isinstance(e.orig, InvalidTextRepresentation):
-                return None
-            raise e
+        query = session.query(TodoItem).filter(TodoItem.id == item_id_uuid)
+        return query.one_or_none()
 
 
 def add_todo_item(content: str) -> uuid.UUID:
@@ -85,38 +81,39 @@ def add_todo_item(content: str) -> uuid.UUID:
 
 
 def delete_todo_item(item_id: str) -> bool:
-    with db.session() as session:
-        try:
-            affected_rows = session.query(
-                TodoItem
-            ).filter(
-                TodoItem.id == item_id
-            ).delete()
+    try:
+        item_id_uuid = uuid.UUID(item_id)
+    except ValueError:
+        return False
 
-            session.commit()
-            return affected_rows > 0
-        except DataError as e:
-            if isinstance(e.orig, InvalidTextRepresentation):
-                return False
+    with db.session() as session:
+        affected_rows = session.query(
+            TodoItem
+        ).filter(
+            TodoItem.id == item_id_uuid
+        ).delete()
+
+        session.commit()
+        return affected_rows > 0
 
 
 def update_todo_item(item_id: str, content: str) -> bool:
-    with db.session() as session:
-        try:
-            affected_rows = session.query(
-                TodoItem
-            ).filter(
-                TodoItem.id == item_id
-            ).update({
-                'content': content
-            })
+    try:
+        item_id_uuid = uuid.UUID(item_id)
+    except ValueError:
+        return False
 
-            session.commit()
-            return affected_rows > 0
-        except DataError as e:
-            if isinstance(e.orig, InvalidTextRepresentation):
-                return False
-            raise e
+    with db.session() as session:
+        affected_rows = session.query(
+            TodoItem
+        ).filter(
+            TodoItem.id == item_id_uuid
+        ).update({
+            'content': content
+        })
+
+        session.commit()
+        return affected_rows > 0
 
 
 def delete_all_todo_items():
