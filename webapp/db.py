@@ -32,10 +32,10 @@ def open_connection_pool():
         pool_timeout=10
     )
 
-    atexit.register(_close_pool)
+    atexit.register(_close_connection_pool)
 
 
-def _close_pool():
+def _close_connection_pool():
     global _engine
 
     if not _engine:
