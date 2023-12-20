@@ -2,13 +2,13 @@ import uuid
 from typing import Optional, List
 
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column, declarative_base
+from sqlalchemy.orm import Mapped, mapped_column
 from uuid_extensions import uuid7
 
 from webapp import db
 
 
-class TodoItem(declarative_base()):
+class TodoItem(db.Base):
     __tablename__ = 'todo_items'
 
     id: Mapped[uuid.UUID] = mapped_column('id', primary_key=True)

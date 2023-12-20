@@ -2,11 +2,15 @@ import atexit
 from typing import Optional
 
 from sqlalchemy import create_engine, Engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, DeclarativeBase
 
 from webapp.config import get_config
 
 _engine: Optional[Engine] = None
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 def session():
