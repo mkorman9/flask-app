@@ -2,14 +2,14 @@ from flask_sock import Sock
 
 from webapp import db
 from webapp.flask_base_app import create_flask_base_app
-from webapp.config import get_config
+from webapp.config import load_config
 from webapp.healthcheck import healthcheck_api
 from webapp.logger import configure_logger
 from webapp.todo_items import todo_items_api
 from webapp.websocket import websocket_api
 
 configure_logger()
-_ = get_config()
+load_config()
 db.open_pool()
 
 app = create_flask_base_app(__name__)

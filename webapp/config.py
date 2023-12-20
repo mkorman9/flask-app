@@ -20,11 +20,17 @@ def get_config():
     global _config
 
     if not _config:
-        try:
-            load_dotenv()
-            _config = ConfigModel(**os.environ)
-        except ValidationError as e:
-            logging.error('🚫 Failed to load configuration', exc_info=e)
-            sys.exit(4)
+        raise RuntimeError('Config is not loaded')
 
     return _config
+
+
+def load_config():
+    global _config
+
+    try:
+        load_dotenv()
+        _config = ConfigModel(**os.environ)
+    except ValidationError as e:
+        logging.error('🚫 Failed to load configuration', exc_info=e)
+        sys.exit(4)
