@@ -1,14 +1,14 @@
 import logging
+import os
 
 import gevent
 
 
 def configure_logger():
-    # Logging configuration for development run
-    # Production config is defined in .gunicorn/logging.conf file
     logging.basicConfig(
-        level=logging.DEBUG,
-        format='[%(asctime)s] [%(levelname)s] %(message)s'
+        level=os.environ.get("LOG_LEVEL", "INFO"),
+        format='[%(asctime)s] [%(process)d] [%(levelname)s] %(message)s',
+        force=True
     )
 
     # Mute gevent exceptions
