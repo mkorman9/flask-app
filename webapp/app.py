@@ -10,7 +10,7 @@ from webapp.websocket import websocket_api
 
 configure_logger()
 load_config()
-db.open_pool()
+db.open_connection_pool()
 
 app = create_flask_base_app(__name__)
 websockets = Sock(app)

@@ -22,7 +22,7 @@ def session():
     return Session(_engine)
 
 
-def open_pool():
+def open_connection_pool():
     global _engine
 
     c = get_config()
