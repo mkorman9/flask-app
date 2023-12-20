@@ -3,10 +3,12 @@ import logging
 from flask import Flask
 from pydantic import ValidationError
 from werkzeug.exceptions import HTTPException
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 def create_flask_base_app(import_name: str) -> Flask:
     app = Flask(import_name)
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
     @app.errorhandler(ValidationError)
     def validation_error(e: ValidationError):
