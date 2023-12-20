@@ -2,35 +2,38 @@ import atexit
 import logging
 from typing import Optional
 
-from gevent.threading import Lock
 from psycopg_pool import ConnectionPool
 
 from webapp.config import get_config
 
 _pool: Optional[ConnectionPool] = None
-_lock = Lock()
 
 
 def connection():
-    global _pool, _lock
+    global _pool
 
-    with _lock:
-        if not _pool:
-            logging.getLogger('psycopg.pool').setLevel('ERROR')
-
-            c = get_config()
-            _pool = ConnectionPool(
-                c.DB_URL,
-                min_size=c.DB_POOL_MIN,
-                max_size=c.DB_POOL_MAX,
-                timeout=10,
-                reconnect_failed=_reconnect_failed,
-                open=True
-            )
-
-            atexit.register(_close_pool)
+    if not _pool:
+        raise RuntimeError('Pool is closed')
 
     return _pool.connection()
+
+
+def open_pool():
+    global _pool
+
+    logging.getLogger('psycopg.pool').setLevel('ERROR')
+
+    c = get_config()
+    _pool = ConnectionPool(
+        c.DB_URL,
+        min_size=c.DB_POOL_MIN,
+        max_size=c.DB_POOL_MAX,
+        timeout=10,
+        reconnect_failed=_reconnect_failed,
+        open=True
+    )
+
+    atexit.register(_close_pool)
 
 
 def _close_pool():
