@@ -8,7 +8,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 def create_flask_base_app(import_name: str) -> Flask:
     app = Flask(import_name)
-    app.wsgi_app = ProxyFix(app.wsgi_app)
+    app.wsgi_app = ProxyFix(app.wsgi_app)  # type: ignore[method-assign]
 
     @app.errorhandler(ValidationError)
     def validation_error(e: ValidationError):
